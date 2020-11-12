@@ -18,7 +18,7 @@ exports.at_connect = async function() {
   await connect();
   return 'device connected'
 };
-exports.at_disconnect = function() {
+exports.at_disconnect = async function() {
   await disconnect();
   return 'device disconnected'
 };
@@ -29,7 +29,7 @@ exports.ati = function() {
 };
 
 exports.test = function() {
-  writeCmd("ping google.com");
+  //writeCmd("ping google.com");
   return 'test'
 };
 
