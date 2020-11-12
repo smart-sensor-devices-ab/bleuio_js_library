@@ -1,6 +1,6 @@
 {
   "name": "bleuio_test_lib",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "test library bleuio",
   "main": "index.js",
   "scripts": {
