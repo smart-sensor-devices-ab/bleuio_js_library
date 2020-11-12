@@ -28,6 +28,12 @@ exports.ati = function() {
   return 'device information'
 };
 
+exports.test = function() {
+  writeCmd("ping google.com");
+  return 'test'
+};
+
+
 async function connect() {
   // - Request a port and open a connection.
   port = await navigator.serial.requestPort();
@@ -45,11 +51,7 @@ async function connect() {
   );
 
   reader = inputStream.getReader();
-  readLoop().catch((error) => {
-    toggleUIConnected(false);
-    port = null;
-    log.textContent = "Dongle Disconnected!";
-  });
+
 }
 
 async function disconnect() {
