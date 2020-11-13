@@ -18,7 +18,7 @@ Javascript Library for BleuIO
 Install the library by running
 
 ```sh
-npm i bleuio_test_lib
+npm i bleuio
 ```
 In the js file, import
 ```sh
