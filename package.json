@@ -1,19 +1,19 @@
 {
-  "name": "bleuio_test_lib",
-  "version": "1.0.4",
-  "description": "test library bleuio",
+  "name": "bleuio",
+  "version": "1.0.0",
+  "description": "BleuIO javascript library",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/shuhad/bleuio_test_lib.git"
+    "url": "git+https://github.com/smart-sensor-devices-ab/bleuio_js_library.git"
   },
   "author": "Sheikh Shuhad",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/shuhad/bleuio_test_lib/issues"
+    "url": "https://github.com/smart-sensor-devices-ab/bleuio_js_library/issues"
   },
-  "homepage": "https://github.com/shuhad/bleuio_test_lib#readme"
+  "homepage": "https://github.com/smart-sensor-devices-ab/bleuio_js_library#readme"
 }
