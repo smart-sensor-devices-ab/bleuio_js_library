@@ -6,6 +6,7 @@ Javascript Library for BleuIO
 # Requirments
   - Chrome 78 or later and you need to enable the **#enable-experimental-web-platform-features** flag in chrome://flags
   - [BleuIO](https://www.bleuio.com/)
+ 
  To enable the flag Open **chrome://flags/#enable-experimental-web-platform-features** in Google Chrome browser.
 
 
@@ -17,11 +18,11 @@ Javascript Library for BleuIO
 Install the library by running
 
 ```sh
-npm i bleuio_test_lib
+npm i bleuio
 ```
 In the js file, import
 ```sh
-import * as my_dongle from 'bleuio_test_lib'
+import * as my_dongle from 'bleuio'
 ```
 
 You are set to go. 
