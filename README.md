@@ -22,7 +22,7 @@ npm i bleuio
 ```
 In the js file, import
 ```sh
-import * as my_dongle from 'bleuio_test_lib'
+import * as my_dongle from 'bleuio'
 ```
 
 You are set to go. 
