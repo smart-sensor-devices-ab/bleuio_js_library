@@ -39,16 +39,17 @@ Note : you have to wait for the dongle to load.
 ###Example 
 ***index.html***
 ```sh
-<script src="./index.js"></script>
+
 <button id="connect">Connect</button>
 <button id="deviceinfo">Device Info</button>
 <button id="central">Central Mode</button>
 <button id="peripheral">Peripheral Mode</button>
     .....
+<script src="./index.js"></script>
 ```
 ***index.js***
 ```sh
-import * as my_dongle from 'bleuio_test_lib'
+import * as my_dongle from 'bleuio'
 document.getElementById('connect').addEventListener('click', function(){
   my_dongle.at_connect()
 })
