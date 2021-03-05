@@ -461,8 +461,7 @@ async function readLoop(t, e) {
                 if (20 == arr.length) return arr;
                 break;
             case "at_spssend":                
-            if (arr.includes("[Sent]"))
-                return arr.slice((arr.length - 3), arr.length);
+            if (2 == arr.length || arr.includes("[Sent]")) return arr;    
             case "help":
                 if (arr.includes("[A] = Usable in All Roles")) return arr;
                 break;
