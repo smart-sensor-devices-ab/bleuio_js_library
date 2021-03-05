@@ -1,6 +1,6 @@
 {
   "name": "bleuio",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "BleuIO javascript library",
   "main": "index.js",
   "scripts": {
