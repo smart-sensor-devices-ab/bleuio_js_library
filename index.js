@@ -444,7 +444,7 @@ async function readLoop(t, e) {
                 if (4 == arr.length) return arr;
                 break;
             case "at_gapconnect":
-                if (arr.includes("CONNECTED.") || arr.includes("DISCONNECTED.") || arr.includes("ERROR")) return arr;
+                if (arr.includes("CONNECTED.") || arr.includes("DISCONNECTED.") || arr.includes("ERROR") || arr.includes("PAIRING SUCCESS")) return arr;
                 break;
             case "at_getservices":
                 if (arr.includes("Value received: ")) return arr;
@@ -452,10 +452,10 @@ async function readLoop(t, e) {
             case "at_gapdisconnect":
                 return "Disconnected.";
             case "at_numcompa":
-                if (2 == arr.length) return arr;
+                if (arr.includes("ERROR") || arr.includes("OK")) return arr;
                 break;
             case "at_seclvl":
-                if (2 == arr.length) return arr;
+                if ((2 == arr.length))  return arr;
                 break;
             case "at_setnoti":
                 if (20 == arr.length) return arr;
