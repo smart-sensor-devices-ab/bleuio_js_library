@@ -2,7 +2,7 @@
 
 [![N|Solid](https://www.bleuio.com/getting_started//img/logo.png)](https://www.bleuio.com/getting_started//img/logo.png)
 
-Javascript Library for BleuIO . Supports **v1.3.1 Firmware**
+Javascript Library for BleuIO . Supports **v2.0.1 Firmware**
 # Requirments
   - Chrome 78 or later and you need to enable the **#enable-experimental-web-platform-features** flag in chrome://flags
   - [BleuIO](https://www.bleuio.com/)
