@@ -147,6 +147,24 @@ function writeCmd(t) {
     return writeCmd("AT+CANCELCONNECT"), readLoop("at_cancelconnect");
 }),
 /**
+ * @at_client
+ * Only usable in Dual role. Sets the dongle role towards the targeted connection to client.
+ * @return {Promise} returns a promise
+ * 
+*/
+(exports.at_client = function () {
+    return writeCmd("AT+CLIENT"), readLoop("at_client");
+}),
+/**
+ * @at_dual
+ * Sets the device Bluetooth role to dual role. This means it has the capabilities of both Central and Peripheral role. Advertising must be stopped and, any connection must be terminated before the role change is accepted.
+ * @return {Promise} returns a promise
+ * 
+*/
+(exports.at_dual = function () {
+    return writeCmd("AT+DUAL"), readLoop("at_dual");
+}),
+/**
  * @at_enterpasskey
  * Enter the 6-digit passkey to continue the pairing and bodning request.
  * @param {string} t Enter the 6-digit passkey.
@@ -256,6 +274,15 @@ Only usable when connected to a device.
     return writeCmd("AT+GAPDISCONNECT"), readLoop("at_gapdisconnect");
 }),
 /**
+ * @at_getconn
+ * Gets a list of currently connected devices along with their mac addresses, connection index, our role towards this connection and if it's bonded/paired.
+ * @return {Promise} returns a promise
+ * 
+*/
+(exports.at_getconn = async function () {
+    return writeCmd("AT+GETCONN"), readLoop("at_getconn");
+}),
+/**
  * @at_getservices
  * Rediscovers a peripheral's services and characteristics.
  * @return {Promise} returns a promise
@@ -276,6 +303,15 @@ Only usable when connected to a device.
     return writeCmd("AT+SCANTARGET=" + t), readLoop("at_scantarget", e+2);
 }),
 /**
+ * @at_server
+ * Only usable in Dual role. Sets the dongle role towards the targeted connection to server.
+ * @return {Promise} returns a promise
+ * 
+*/
+(exports.at_server = function () {
+    return writeCmd("AT+SERVER"), readLoop("at_server");
+}),
+/**
  * @at_setnoti
  * Enable notification for selected characteristic.
  * @param {string} t notification handle
@@ -294,6 +330,17 @@ Only usable when connected to a device.
 */
 (exports.at_spssend = function (t) {
         return writeCmd(t ? "AT+SPSSEND=" + t : "AT+SPSSEND"),  readLoop("at_spssend");
+}),
+/**
+ * @at_targetconn
+ * Setting or querying the connection index to use as the targeted connection.
+When connected to several devices, the target connection decides which device you target when using commands such as AT+GATTCREAD, AT+GATTCWRITE, AT+GAPDISCONNECT, AT+GAPPAIR or AT+SPSSEND etc.
+ * @param {string} t write connecton index of target device. if left empty it will show what device you are targeting at the momment.
+ * @return {Promise} returns a promise
+ * 
+*/
+(exports.at_targetconn = function (t) {
+    return writeCmd(t ? "AT+TARGETCONN=" + t : "AT+TARGETCONN"),  readLoop("at_targetconn");
 }),
 /**
  * @at_gapstatus
@@ -369,9 +416,9 @@ class LineBreakTransformer {
 }
 async function readLoop(t, e) {
     for (arr = []; ; ) {
-        const { done: r, value: a } = await reader.read();
+        const { done: r, value: a } = await reader.read();        
         switch ((a && arr.push(a), t)) {
-
+            
             case "ati":
                 if (arr.includes("Not Advertising") || arr.includes("Advertising")) return arr;
                 break;
@@ -394,6 +441,10 @@ async function readLoop(t, e) {
             case "at_cancelconnect":
                 if (arr.includes("ERROR") || arr.includes("OK")) return arr;
                 break;
+            case "at_client":
+                return "Client";                
+            case "at_dual":
+                return "Dual Mode";
             case "at_enterpasskey":
                 if (2 == arr.length) return arr;
                 break;
@@ -419,6 +470,11 @@ async function readLoop(t, e) {
                     arr.some(function(v){ if (v.indexOf("RSSI")>=0 && a!='') console.log(a) })
                 if (arr.includes("SCAN COMPLETE")) return arr;
                 break;
+            case "at_getconn":
+               if (arr.includes("No Connections found.") || 2 == arr.length )
+               {
+                   return arr;
+               }       
             case "at_scantarget":
                 if (arr.length == e) {
                     const t = outputStream.getWriter();
@@ -457,16 +513,23 @@ async function readLoop(t, e) {
             case "at_seclvl":
                 if ((2 == arr.length))  return arr;
                 break;
+            case "at_server":
+                return "Server";                   
             case "at_setnoti":
                 if (20 == arr.length) return arr;
                 break;
             case "at_spssend":                
-            if (2 == arr.length || arr.includes("[Sent]")) return arr;    
+            if (2 == arr.length || arr.includes("[Sent]")) return arr;  
+            case "at_targetconn":                
+            if (2 == arr.length) return arr;    
             case "help":
                 if (arr.includes("[A] = Usable in All Roles")) return arr;
                 break;
-            default:
+            default:                
                 return "Nothing!";
         }
+        
     }
+    
 }
+   
