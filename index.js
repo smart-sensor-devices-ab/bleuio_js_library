@@ -40,6 +40,38 @@ function writeCmd(t) {
     return await disconnect(), "device disconnected";
 }),
 /**
+ * @ata
+ * Shows/hides ASCII values from notification/indication/read responses. 
+ * ata(0) hides the ASCII values,
+ * ata(1) shows the ASCII values.
+ * @return {Promise} returns promise
+ * 
+*/
+(exports.ata = function (status) {
+    return writeCmd("ATA"+status), readLoop("ata");
+}),
+/**
+ * @atasps
+ * Toggle between ascii and hex responses received from SPS. 
+ * atasps(0) shows hex values, atasps(1) shows ASCII. ASCII is on by default.
+ * @return {Promise} returns promise
+ * 
+*/
+(exports.atasps = function (status) {
+    return writeCmd("ATASPS"+status), readLoop("atasps");
+}),
+/**
+ * @atds
+ * Turns auto discovery of services when connecting on/off. 
+ * ATDS0 off, ATDS1 on. 
+ * On by default. This command can be used in both central and peripheral role.
+ * @return {Promise} returns promise
+ * 
+*/
+(exports.atds = function (status) {
+    return writeCmd("ATDS"+status), readLoop("atds");
+}),
+/**
  * @ati
  * Device information query.
  * @return {Promise} returns promise
@@ -70,6 +102,15 @@ function writeCmd(t) {
 */  
 (exports.at_central = function () {
     return writeCmd("AT+CENTRAL"), readLoop("at_central");
+}),
+/**
+ * @at_dis
+ * Shows the Device Information Service information to be used.
+ * @return {Promise} returns promise
+ * 
+*/  
+(exports.at_dis = function () {
+    return writeCmd("AT+DIS"), readLoop("at_dis");
 }),
 /**
  * @at_peripheral
@@ -156,6 +197,16 @@ function writeCmd(t) {
     return writeCmd("AT+CLIENT"), readLoop("at_client");
 }),
 /**
+ * @at_clearnoti
+ * Disables notification for selected characteristic.
+ * @param {string} t notification handle string.
+ * @return {Promise} returns a promise
+ * 
+*/
+(exports.at_clearnoti = function (t) {
+    return writeCmd("AT+CLEARNOTI="+t), readLoop("at_clearnoti");
+}),
+/**
  * @at_dual
  * Sets the device Bluetooth role to dual role. This means it has the capabilities of both Central and Peripheral role. Advertising must be stopped and, any connection must be terminated before the role change is accepted.
  * @return {Promise} returns a promise
@@ -213,6 +264,15 @@ Only usable when connected to a device.
 */
 (exports.at_gapunpair = function (t) {
     return writeCmd(t ? "AT+GAPUNPAIR=" + t : "AT+GAPUNPAIR"), readLoop("at_gapunpair");
+}),
+/**
+ * @at_gapdisconnectall
+ * Disconnects from all connected peer Bluetooth devices. This command can be used in both central and peripheral role.
+ * @return {Promise} returns a promise
+ * 
+*/
+(exports.at_gapdisconnectall = function () {
+    return writeCmd("AT+GAPDISCONNECTALL"), readLoop("at_gapdisconnectall");
 }),
 /**
  * @at_gapscan
@@ -292,6 +352,44 @@ Only usable when connected to a device.
     return writeCmd("AT+GETSERVICES"), readLoop("at_getservices");
 }),
 /**
+ * @at_getservicesonly
+ * Discovers a peripherals services.
+ * @return {Promise} returns a promise
+ * 
+*/
+(exports.at_getservicesonly = function () {
+    return writeCmd("AT+GETSERVICESONLY"), readLoop("at_getservicesonly");
+}),
+/**
+ * @at_getservicesdetails
+ * Discovers all characteristics and descriptors of a selected service. Must run at_getservicesonly() first to get the service handle.
+ * Example : at_getservicesdetails('0001')
+ * @param {string} t service param
+ * @return {Promise} returns a promise
+ * 
+*/
+(exports.at_getservicesdetails = function (t) {
+    return writeCmd("AT+GETSERVICEDETAILS="+ t), readLoop("at_getservicesdetails");
+}),
+/**
+ * @at_indi
+ * Shows list of set indication handles along with the connection index so you can see what indication you have enabled on which connected device.
+ * @return {Promise} returns a promise
+ * 
+*/
+(exports.at_indi = function () {
+    return writeCmd("AT+INDI"), readLoop("at_indi");
+}),
+/**
+ * @at_noti
+ * Shows list of set notification handles along with the connection index so you can see what notification you have enabled on which connected device.
+ * @return {Promise} returns a promise
+ * 
+*/
+(exports.at_noti = function () {
+    return writeCmd("AT+NOTI"), readLoop("at_noti");
+}),
+/**
  * @at_scantarget
  * Scan a target device. Displaying it's advertising and response data as it updates.
  * @param {string} t hex str format: xx:xx:xx:xx:xx:xx
@@ -301,6 +399,21 @@ Only usable when connected to a device.
 */
 (exports.at_scantarget = function (t, e = 1) {
     return writeCmd("AT+SCANTARGET=" + t), readLoop("at_scantarget", e+2);
+}),
+/**
+ * @at_setdis
+ * Sets the Device Information Service information. example at_setdis(MAN_NAME,MOD_NUM,HW_REV,FW_REV,SW_REV)
+ * @param {string} name Manufacturer Name
+ * @param {string} num Model Number
+ * @param {string} serial Serial Number
+ * @param {string} hrev Hardware revision
+ * @param {string} frev Firmware revision
+ * @param {string} srev Software revision
+ * @return {Promise} returns a promise
+ * 
+*/
+(exports.at_setdis = function (name,num,serial,hrev,frev,srev) {
+    return writeCmd("AT+SETDIS=" + name +"="+ num +"="+ serial +"="+ hrev +"="+ frev +"="+srev), readLoop("at_setdis");
 }),
 /**
  * @at_server
@@ -320,6 +433,16 @@ Only usable when connected to a device.
 */
 (exports.at_setnoti = function (t) {
     return writeCmd("AT+SETNOTI=" + t),  readLoop("at_setnoti");
+}),
+/**
+ * @at_setindi
+ * Enable indication for selected characteristic.
+ * @param {string} t indication  handle
+ * @return {Promise} returns a promise
+ * 
+*/
+(exports.at_setindi = function (t) {
+    return writeCmd("AT+SETINDI=" + t),  readLoop("at_setindi");
 }),
 /**
  * @at_spssend
@@ -370,8 +493,30 @@ When connected to several devices, the target connection decides which device yo
  * @return {Promise} returns a promise
  * 
 */
-(exports.at_gattcwriteb = function () {
+(exports.at_gattcwriteb = function (handle_param,msg) {
     return writeCmd("AT+GATTCWRITEB="+handle_param+" "+msg), readLoop("at_gattcwriteb");
+}),
+/**
+ * @at_gattcwritewr
+ * Write (without response) attribute to remote GATT server in ASCII. Can only be used in Central role and when connected to a peripheral.
+ * @param {string} handle_param pass handle param as string
+ * @param {string} msg pass msg as string.
+ * @return {Promise} returns a promise
+ * 
+*/
+(exports.at_gattcwritewr = function (handle_param,msg) {
+    return writeCmd("AT+GATTCWRITEWR="+handle_param+" "+msg), readLoop("at_gattcwritewr");
+}),
+/**
+ * @at_gattcwritewrb
+ * Write (without response) attribute to remote GATT server in Hex. Can only be used in Central role and when connected to a peripheral.
+ * @param {string} handle_param pass handle param as string
+ * @param {string} msg pass msg as string.
+ * @return {Promise} returns a promise
+ * 
+*/
+(exports.at_gattcwritewrb = function (handle_param,msg) {
+    return writeCmd("AT+GATTCWRITEWRB="+handle_param+" "+msg), readLoop("at_gattcwritewrb");
 }),
 /**
  * @at_gattcread
@@ -419,6 +564,15 @@ async function readLoop(t, e) {
         const { done: r, value: a } = await reader.read();        
         switch ((a && arr.push(a), t)) {
             
+            case "ata":
+                if (2 == arr.length) return arr;
+                break;
+            case "atasps":
+            if (2 == arr.length) return arr;
+            break;
+            case "atds":
+                if (2 == arr.length) return arr;
+                break;
             case "ati":
                 if (arr.includes("Not Advertising") || arr.includes("Advertising")) return arr;
                 break;
@@ -427,6 +581,9 @@ async function readLoop(t, e) {
                 break;
             case "at_central":
                 return "Central Mode";
+            case "at_dis":
+                if (arr.includes("dis_info_end")) return arr;
+                break;
             case "at_peripheral":
                 return "Peripheral Mode";
             case "at_advstart":
@@ -442,7 +599,10 @@ async function readLoop(t, e) {
                 if (arr.includes("ERROR") || arr.includes("OK")) return arr;
                 break;
             case "at_client":
-                return "Client";                
+                return "Client";  
+            case "at_clearnoti":
+                if (2 == arr.length) return arr;
+                break;           
             case "at_dual":
                 return "Dual Mode";
             case "at_enterpasskey":
@@ -456,6 +616,9 @@ async function readLoop(t, e) {
                     return t.write(""), t.releaseLock(), arr;
                 }
                 break;
+            case "at_gapdisconnectall":
+                if (arr.includes("All connections terminated.")) return arr;
+                break;
             case "at_gapiocap":
                 if (3 == arr.length) return arr;
                 break;            
@@ -468,18 +631,27 @@ async function readLoop(t, e) {
             case "at_gapscan":
                 if(e===true)
                     arr.some(function(v){ if (v.indexOf("RSSI")>=0 && a!='') console.log(a) })
-                if (arr.includes("SCAN COMPLETE")) return arr;
+                if (arr.includes("SCAN COMPLETE")) return arr;                
                 break;
             case "at_getconn":
                if (arr.includes("No Connections found.") || 2 == arr.length )
                {
                    return arr;
-               }       
+               } 
+            case "at_indi":
+                if (2 == arr.length) return arr;
+                break;
+            case "at_noti":
+                if (2 == arr.length) return arr;
+                break;   
             case "at_scantarget":
                 if (arr.length == e) {
                     const t = outputStream.getWriter();
                     return t.write(""), t.releaseLock(), arr.slice(2);
                 }
+                break; 
+            case "at_setdis":
+                if (2 == arr.length) return arr;
                 break;  
             case "at_setpasskey":
                 if (2 == arr.length) return arr;
@@ -496,6 +668,12 @@ async function readLoop(t, e) {
             case "at_gattcwriteb":
                 if (4 == arr.length) return arr;
                 break;
+            case "at_gattcwritewr":
+                if (2 == arr.length) return arr;
+                break;
+            case "at_gattcwritewrb":
+                if (2 == arr.length) return arr;
+                break;
             case "at_gattcread":
                 if (4 == arr.length) return arr;
                 break;
@@ -505,6 +683,14 @@ async function readLoop(t, e) {
             case "at_getservices":
                 if (arr.includes("Value received: ")) return arr;
                 break;
+            case "at_getservicesonly":
+                if (arr.includes("handle_evt_gattc_discover_completed: conn_idx=0000 type=SVC status=0")) return arr;
+                break;
+            case "at_getservicesdetails":
+                if (arr.includes("handle_evt_gattc_browse_completed: conn_idx=0000 status=0")) 
+                return arr;
+                break;
+        
             case "at_gapdisconnect":
                 return "Disconnected.";
             case "at_numcompa":
@@ -518,6 +704,9 @@ async function readLoop(t, e) {
             case "at_setnoti":
                 if (20 == arr.length) return arr;
                 break;
+            case "at_setindi":
+                if (2 == arr.length) return arr;
+                break;
             case "at_spssend":                
             if (2 == arr.length || arr.includes("[Sent]")) return arr;  
             case "at_targetconn":                
@@ -528,7 +717,6 @@ async function readLoop(t, e) {
             default:                
                 return "Nothing!";
         }
-        
     }
     
 }
