@@ -118,6 +118,19 @@ function writeCmd(t) {
     return writeCmd('AT+CENTRAL'), readLoop('at_central');
   }),
   /**
+   * @at_devicename
+   * Get or sets the device name used for GAP service. Cannot be set while connected or advertising.
+   * @param {string} t  if left empty it will query what device name is is set
+   * @return {Promise} returns a promise
+   *
+   */
+  (exports.at_devicename = function (t) {
+    return (
+      writeCmd(t ? 'AT+DEVICENAME=' + t : 'AT+DEVICENAME'),
+      readLoop('at_devicename')
+    );
+  }),
+  /**
    * @at_dis
    * Shows the Device Information Service information to be used.
    * @return {Promise} returns promise
@@ -312,7 +325,7 @@ Only usable when connected to a device.
   }),
   /** @at_seclvl
    * Sets or queries what minimum security level will be used when connected to other devices.
-   * @param {number} t leave blank for quering security level or set security level from 1 to 3. 1- No authentication and no encryption, 2-Unauthenticated pairing with encryption, 3 -Authenticated pairing with encryption
+   * @param {number} t leave blank for quering security level or set security level from 1 to 4. 1- No authentication and no encryption, 2-Unauthenticated pairing with encryption, 3 -Authenticated pairing with encryption, 4-Authenticated LE Secure Connections pairing with encryption.
    * @return {Promise} returns a promise
    *
    */
@@ -341,6 +354,29 @@ Only usable when connected to a device.
    */
   (exports.at_findscandata = function (t = 1, e = 5) {
     return writeCmd('AT+FINDSCANDATA=' + t), readLoop('at_findscandata', e);
+  }),
+  /**
+   * @at_frssi
+   * Sets RSSI filter for scan results, afterwards scans will only show results with the chosen max value or below.
+   * @param {string} t number : Acceptable parameter range: -1 to -99
+   * @return {Promise} returns a promise
+   *
+   */
+  (exports.at_frssi = function (t) {
+    return writeCmd('AT+FRSSI=' + t), readLoop('at_frssi');
+  }),
+  /**
+   * @at_gapaddrtype
+   * Sets or queries what address type the dongle will use. Changing address type cannot be done while advertising or while connected to other devices.
+   * @param {string} t number : example at_gapaddrtype(1) or at_gapaddrtype(2) or at_gapaddrtype(3) or at_gapaddrtype(4) or at_gapaddrtype(5)
+   * 1  Public Static Address, 2 Private Static Address, 3 Private Random Resolvable Address, 4 Private Random Non-resolvable Address, 5 Private Random Resolvable address using Bluetooth LE Privacy v1.2	
+   *
+   
+   * @return {Promise} returns a promise
+   *
+   */
+  (exports.at_gapaddrtype = function (t) {
+    return writeCmd('AT+GAPADDRTYPE=' + t), readLoop('at_gapaddrtype');
   }),
   /**
    * @at_gapconnect
@@ -462,6 +498,15 @@ Only usable when connected to a device.
     );
   }),
   /**
+   * @at_getmac
+   * Returns MAC address of the BleuIO device.
+   * @return {Promise} returns a promise
+   *
+   */
+  (exports.at_getmac = function () {
+    return writeCmd('AT+GETMAC'), readLoop('at_getmac');
+  }),
+  /**
    * @at_server
    * Only usable in Dual role. Sets the dongle role towards the targeted connection to server.
    * @return {Promise} returns a promise
@@ -489,6 +534,16 @@ Only usable when connected to a device.
    */
   (exports.at_setindi = function (t) {
     return writeCmd('AT+SETINDI=' + t), readLoop('at_setindi');
+  }),
+  /**
+   * @at_mtu
+   * Sets  the max allowed MTU size. Cannot be changed while connected/connecting or advertising.
+   * @param {number} t Minimum allowed value: 67, Maximum allowed value: 512
+   * @return {Promise} returns a promise
+   *
+   */
+  (exports.at_mtu = function (t) {
+    return writeCmd(t ? 'AT+MTU=' + t : 'AT+MTU'), readLoop('at_mtu');
   }),
   /**
    * @at_spssend
@@ -647,6 +702,9 @@ async function readLoop(t, e) {
       case 'at_dis':
         if (arr.includes('dis_info_end')) return arr;
         break;
+      case 'at_devicename':
+        if (2 == arr.length) return arr;
+        break;
       case 'at_peripheral':
         return 'Peripheral Mode';
       case 'at_advstart':
@@ -734,11 +792,17 @@ async function readLoop(t, e) {
       case 'at_gattcwriteb':
         if (4 == arr.length) return arr;
         break;
+      case 'at_mtu':
+        if (2 == arr.length) return arr;
+        break;
       case 'at_gattcwritewr':
         if (2 == arr.length) return arr;
         break;
       case 'at_gattcwritewrb':
         if (2 == arr.length) return arr;
+        break;
+      case 'at_getmac':
+        if (3 == arr.length) return arr;
         break;
       case 'at_gattcread':
         if (arr.length > 1) {
@@ -788,6 +852,12 @@ async function readLoop(t, e) {
         if (arr.includes('ERROR') || arr.includes('OK')) return arr;
         break;
       case 'at_seclvl':
+        if (2 == arr.length) return arr;
+        break;
+      case 'at_gapaddrtype':
+        if (2 == arr.length) return arr;
+        break;
+      case 'at_frssi':
         if (2 == arr.length) return arr;
         break;
       case 'at_server':
