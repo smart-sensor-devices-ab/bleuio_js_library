@@ -124,10 +124,76 @@ function writeCmd(t) {
    * @return {Promise} returns a promise
    *
    */
+  /**
+   * @at_customservice
+   * Sets or queries Custom Service. Max 5 Characteristics can be added.
+   * Pass value in this format at_customservice('0=UUID=ee6ec068-7447-4045-9fd0-593f3ba3c2ee')
+   * Follow BleuIO documentaion for AT+CUSTOMSERVICE
+   * _Several values cannot be changed while connected/connecting or advertising.
+   * @return {Promise} returns promise
+   *
+   */
+  (exports.at_customservice = function (t) {
+    return (
+      writeCmd(t ? 'AT+CUSTOMSERVICE=' + t : 'AT+CUSTOMSERVICE'),
+      readLoop('at_customservice')
+    );
+  }),
+  /**
+   * @at_customservicestart
+   * Starts the Custom Service based on the settings set by AT+CUSTOMSERVICE= Command.
+   * Cannot be started while connected/connecting or advertising.
+   * @return {Promise} returns promise
+   *
+   */
+  (exports.at_customservicestart = function (t) {
+    return writeCmd('AT+CUSTOMSERVICESTART'), readLoop('at_customservicestart');
+  }),
+  /**
+   * @at_customservicestop
+   * Stops the Custom Service.
+   * Cannot be changed while connected/connecting or advertising.
+   * @return {Promise} returns promise
+   *
+   */
+  (exports.at_customservicestop = function (t) {
+    return writeCmd('AT+CUSTOMSERVICESTOP'), readLoop('at_customservicestop');
+  }),
+  /**
+   * @at_customservicereset
+   * Stops the Custom Service and resets the Custom Service settings set by the AT+CUSTOMSERVICE= command to it's default values.
+   * Cannot be changed while connected/connecting or advertising.
+   * @return {Promise} returns promise
+   *
+   */
+  (exports.at_customservicereset = function (t) {
+    return writeCmd('AT+CUSTOMSERVICERESET'), readLoop('at_customservicereset');
+  }),
+  /**
+   * @at_devicename
+   * Get or sets the device name used for GAP service. Cannot be set while connected or advertising.
+   * @param {string} t  if left empty it will query what device name is is set
+   * @return {Promise} returns a promise
+   *
+   */
   (exports.at_devicename = function (t) {
     return (
       writeCmd(t ? 'AT+DEVICENAME=' + t : 'AT+DEVICENAME'),
       readLoop('at_devicename')
+    );
+  }),
+  /**
+   * @at_connparam
+   * Sets or displays preferred connection parameters. When run while connected will update connection parameters on the current target connection.
+   * @param {string} t provide connection parameters for example at_connparam('intv_min=intv_max=slave_latency=supervision_timeout')
+   * Follow BleuIO documentation about AT+CONNPARAM
+   * @return {Promise} returns a promise
+   *
+   */
+  (exports.at_connparam = function (t) {
+    return (
+      writeCmd(t ? 'AT+CONNPARAM=' + t : 'AT+CONNPARAM'),
+      readLoop('at_connparam')
     );
   }),
   /**
@@ -208,6 +274,27 @@ function writeCmd(t) {
     return (
       writeCmd(t ? 'AT+ADVRESP=' + t : 'AT+ADVRESP'), readLoop('at_advresp')
     );
+  }),
+  /**
+   * @at_autoexec
+   *  Sets or displays up to 10 commands that will be run upon the BleuIO starting up.
+   * example at_autoexec('AT+ADVSTART')
+   * @param {string} t if left empty it will show a list of auto execution query set previously.
+   * @return {Promise} returns a promise
+   */
+  (exports.at_autoexec = function (t) {
+    return (
+      writeCmd(t ? 'AT+AUTOEXEC=' + t : 'AT+AUTOEXEC'), readLoop('at_autoexec')
+    );
+  }),
+  /**
+   * @at_clrautoexec
+   *  Clear any commands in the auto execute (AUTOEXEC) list.
+   * @return {Promise} returns a promise
+   *
+   */
+  (exports.at_clrautoexec = function () {
+    return writeCmd('AT+CLRAUTOEXEC'), readLoop('at_clrautoexec');
   }),
   /**
    * @at_cancelconnect
@@ -348,12 +435,15 @@ Only usable when connected to a device.
    * @at_findscandata
    * Scans for all advertising/response data which contains the search params. ex. at_findscandata('FF5',10)
    * @param {string} t search params.
-   * @param {number} e number of responses.
+   * @param {number} e number of seconds to scan.
    * @return {Promise} returns a promise
    *
    */
   (exports.at_findscandata = function (t = 1, e = 5) {
-    return writeCmd('AT+FINDSCANDATA=' + t), readLoop('at_findscandata', e);
+    console.log('AT+FINDSCANDATA=' + t + '=' + e);
+    return (
+      writeCmd('AT+FINDSCANDATA=' + t + '=' + e), readLoop('at_findscandata', e)
+    );
   }),
   /**
    * @at_frssi
@@ -498,6 +588,15 @@ Only usable when connected to a device.
     );
   }),
   /**
+   * @at_getbond
+   * Displays all MAC address of bonded devices.
+   * @return {Promise} returns a promise
+   *
+   */
+  (exports.at_getbond = function () {
+    return writeCmd('AT+GETBOND'), readLoop('at_getbond');
+  }),
+  /**
    * @at_getmac
    * Returns MAC address of the BleuIO device.
    * @return {Promise} returns a promise
@@ -534,6 +633,26 @@ Only usable when connected to a device.
    */
   (exports.at_setindi = function (t) {
     return writeCmd('AT+SETINDI=' + t), readLoop('at_setindi');
+  }),
+  /**
+   * @at_suotastart
+   * Enables the SUOTA Service and start the SUOTA Advertising.
+   * Cannot be started while connected/connecting or advertising.
+   * @return {Promise} returns a promise
+   *
+   */
+  (exports.at_suotastart = function () {
+    return writeCmd('AT+SUOTASTART'), readLoop('at_suotastart');
+  }),
+  /**
+   * @at_suotastop
+   * Disables the SUOTA Service and stops the SUOTA Advertising.
+   * Cannot be used while connected/connecting.
+   * @return {Promise} returns a promise
+   *
+   */
+  (exports.at_suotastop = function () {
+    return writeCmd('AT+SUOTASTOP'), readLoop('at_suotastop');
   }),
   /**
    * @at_mtu
@@ -702,8 +821,17 @@ async function readLoop(t, e) {
       case 'at_dis':
         if (arr.includes('dis_info_end')) return arr;
         break;
-      case 'at_devicename':
-        if (2 == arr.length) return arr;
+      case 'at_customservice':
+        if (arr.length == 2) return arr;
+        break;
+      case 'at_customservicestart':
+        if (arr.length == 2) return arr;
+        break;
+      case 'at_customservicestop':
+        if (arr.length == 2) return arr;
+        break;
+      case 'at_customservicereset':
+        if (arr.length == 2) return arr;
         break;
       case 'at_peripheral':
         return 'Peripheral Mode';
@@ -732,10 +860,7 @@ async function readLoop(t, e) {
       case 'atr':
         return 'Trigger platform reset';
       case 'at_findscandata':
-        if (arr.length == e) {
-          const t = outputStream.getWriter();
-          return t.write(''), t.releaseLock(), arr;
-        }
+        if (arr.includes('SCAN COMPLETE')) return arr;
         break;
       case 'at_gapdisconnectall':
         if (arr.includes('All connections terminated.')) return arr;
@@ -801,6 +926,9 @@ async function readLoop(t, e) {
       case 'at_gattcwritewrb':
         if (2 == arr.length) return arr;
         break;
+      case 'at_getbond':
+        if (2 == arr.length) return arr;
+        break;
       case 'at_getmac':
         if (3 == arr.length) return arr;
         break;
@@ -857,6 +985,15 @@ async function readLoop(t, e) {
       case 'at_gapaddrtype':
         if (2 == arr.length) return arr;
         break;
+      case 'at_autoexec':
+        if (2 == arr.length) return arr;
+        break;
+      case 'at_clrautoexec':
+        if (2 == arr.length) return arr;
+        break;
+      case 'at_connparam':
+        if (2 == arr.length) return arr;
+        break;
       case 'at_frssi':
         if (2 == arr.length) return arr;
         break;
@@ -870,6 +1007,12 @@ async function readLoop(t, e) {
         break;
       case 'at_spssend':
         if (2 == arr.length || arr.includes('[Sent]')) return arr;
+      case 'at_suotastart':
+        if (2 == arr.length) return arr;
+        break;
+      case 'at_suotastop':
+        if (2 == arr.length) return arr;
+        break;
       case 'at_targetconn':
         if (2 == arr.length) return arr;
       case 'help':
