@@ -183,9 +183,20 @@ function writeCmd(t) {
     );
   }),
   /**
+   * @at_connectbond
+   * Scan for and initiates a connection with a selected bonded device. Works even if the peer bonded device is advertising with a Private Random Resolvable Address.
+   * @param {string} t provide bonded address for example at_connectbond('40:48:FD:EA:E8:38')
+   * Follow BleuIO documentation about AT+CONNECTBOND
+   * @return {Promise} returns a promise
+   *
+   */
+  (exports.at_connectbond = function (t) {
+    return writeCmd('AT+CONNECTBOND=' + t), readLoop('at_connectbond');
+  }),
+  /**
    * @at_connparam
    * Sets or displays preferred connection parameters. When run while connected will update connection parameters on the current target connection.
-   * @param {string} t provide connection parameters for example at_connparam('intv_min=intv_max=slave_latency=supervision_timeout')
+   * @param {string} t provide connection parameters for example at_connparam('intv_min=intv_max=slave_latency=supervision_timeout'),at_connparam('30=60=1=1000')
    * Follow BleuIO documentation about AT+CONNPARAM
    * @return {Promise} returns a promise
    *
@@ -194,6 +205,34 @@ function writeCmd(t) {
     return (
       writeCmd(t ? 'AT+CONNPARAM=' + t : 'AT+CONNPARAM'),
       readLoop('at_connparam')
+    );
+  }),
+  /**
+   * @at_connscanparam
+   * Set or queries the connection scan window and interval used.
+   * @param {string} t provide connection scan parameters for example at_connscanparam('scan intv ms=scan win ms'),at_connscanparam('200=100')
+   * Follow BleuIO documentation about AT+CONNSCANPARAM
+   * @return {Promise} returns a promise
+   *
+   */
+  (exports.at_connscanparam = function (t) {
+    return (
+      writeCmd(t ? 'AT+CONNSCANPARAM=' + t : 'AT+CONNSCANPARAM'),
+      readLoop('at_connscanparam')
+    );
+  }),
+  /**
+   * @at_scanparam
+   * Set or queries the scan parameters used.
+   * @param {string} t provide scan parameters for example at_scanparam('scan mode=scan type=scan intv ms=scan win ms=filt dupl'),at_scanparam('2=0=200=100=0')
+   * Follow BleuIO documentation about AT+SCANPARAM
+   * @return {Promise} returns a promise
+   *
+   */
+  (exports.at_scanparam = function (t) {
+    return (
+      writeCmd(t ? 'AT+SCANPARAM=' + t : 'AT+SCANPARAM'),
+      readLoop('at_scanparam')
     );
   }),
   /**
@@ -430,6 +469,68 @@ Only usable when connected to a device.
       writeCmd(t ? 'AT+SETPASSKEY=' + t : 'AT+SETPASSKEY'),
       readLoop('at_setpasskey')
     );
+  }),
+  /** @at_setuoi
+   * Set Unique Organization ID. It will be stored in flash memory, and will persist through power cycles. If set, the Unique Organization ID string will be displayed in the ATI command's response. Will clear any previous set Unique Organization ID when set. Max length: 100 characters.
+   * @param {string} t Unique Organization ID string. example at_setuoi('Your Unique Organization ID')
+   * @return {Promise} returns a promise
+   *
+   */
+  (exports.at_setuoi = function (t) {
+    return writeCmd('AT+SETUOI=' + t), readLoop('at_setuoi');
+  }),
+  /** @at_clruoi
+   * Clear any set Unique Organization ID.
+   * @return {Promise} returns a promise
+   *
+   */
+  (exports.at_clruoi = function (t) {
+    return writeCmd('AT+CLRUOI'), readLoop('at_clruoi');
+  }),
+  /** @at_siv
+   * Turns showing verbose scan result index on/off.
+   * @param {string} t 1 for on , 0 for off. Example at_siv(1)
+   * @return {Promise} returns a promise
+   *
+   */
+  (exports.at_siv = function (t) {
+    return writeCmd('ATSIV' + t), readLoop('at_siv');
+  }),
+  /** @at_sra
+   * Turns showing verbose scan result index on/off.
+   * @param {string} t 1 for on , 0 for off. Example at_sra(1)
+   * @return {Promise} returns a promise
+   *
+   */
+  (exports.at_sra = function (t) {
+    return writeCmd('ATSRA' + t), readLoop('at_sra');
+  }),
+  /** @at_assn
+   * Turns on/off showing device names, if present, in scan results from AT+FINDSCANDATA and AT+SCANTARGET scans. (Off per default).
+   * @param {string} t 1 for on , 0 for off. Example at_assn(1)
+   * @return {Promise} returns a promise
+   *
+   */
+  (exports.at_assn = function (t) {
+    return writeCmd('ATASSN' + t), readLoop('at_assn');
+  }),
+  /** @at_assm
+   * Turns on/off showing Manufacturing Specific ID (Company ID), if present, in scan results from AT+GAPSCAN, AT+FINDSCANDATA and AT+SCANTARGET scans. (Off per default).
+   * @param {string} t 1 for on , 0 for off. Example at_assm(1)
+   * @return {Promise} returns a promise
+   *
+   */
+  (exports.at_assm = function (t) {
+    return writeCmd('ATASSN' + t), readLoop('at_assm');
+  }),
+  /** @at_sat
+   * Turns on/off showing address types in scan results from AT+FINDSCANDATA and AT+SCANTARGET scans. (Off per default).
+   * @param {string} t 1 for on , 0 for off. Example at_sat(1)
+   * @return {Promise} returns a promise
+   *
+   */
+  (exports.at_sat = function (t) {
+    return writeCmd('ATSAT' + t), readLoop('at_sat');
   }),
   /**
    * @at_findscandata
@@ -904,6 +1005,21 @@ async function readLoop(t, e) {
       case 'at_setpasskey':
         if (2 == arr.length) return arr;
         break;
+      case 'at_sra':
+        if (2 == arr.length) return arr;
+        break;
+      case 'at_siv':
+        if (2 == arr.length) return arr;
+        break;
+      case 'at_assn':
+        if (2 == arr.length) return arr;
+        break;
+      case 'at_assm':
+        if (2 == arr.length) return arr;
+        break;
+      case 'at_sat':
+        if (2 == arr.length) return arr;
+        break;
       case 'at_gattcwrite':
         if (4 == arr.length) return arr;
         break;
@@ -991,7 +1107,16 @@ async function readLoop(t, e) {
       case 'at_clrautoexec':
         if (2 == arr.length) return arr;
         break;
+      case 'at_connectbond':
+        if (2 == arr.length || arr.includes('SCAN COMPLETE')) return arr;
+        break;
       case 'at_connparam':
+        if (2 == arr.length) return arr;
+        break;
+      case 'at_connscanparam':
+        if (2 == arr.length) return arr;
+        break;
+      case 'at_scanparam':
         if (2 == arr.length) return arr;
         break;
       case 'at_frssi':
@@ -1003,6 +1128,12 @@ async function readLoop(t, e) {
         if (20 == arr.length) return arr;
         break;
       case 'at_setindi':
+        if (2 == arr.length) return arr;
+        break;
+      case 'at_setuoi':
+        if (2 == arr.length) return arr;
+        break;
+      case 'at_clruoi':
         if (2 == arr.length) return arr;
         break;
       case 'at_spssend':
